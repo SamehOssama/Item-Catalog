@@ -16,29 +16,47 @@ session = DBSession()
 @app.route('/')
 @app.route('/producer/')
 def showProducers():
+	producers = session.query(Producer).all()
 	return render_template('producers.html')
 	#return "This page will show all the producers"
 
 @app.route('/producer/new/', methods=['GET', 'POST'])
 def newProducer():
 	if request.method == 'POST':
-		return "Adding new producer"
+		#print(request.form['name'])
+		newProducer = Producer(name = request.form['name'])
+		session.add(newProducer)
+		session.commit()
+		return redirect(url_for('showProducers'))
+		#return "Adding new producer"
 	else:
 		return render_template('newproducer.html')
 		#return "This page will be for adding a new producer"
 
 @app.route('/producer/<int:producer_id>/edit/', methods=['GET', 'POST'])
+#producerToEdit = session.query(Producer).filter_by(id=producer_id).one()
 def editProducer(producer_id):
 	if request.method == 'POST':
-		return "Editing producer {}".format(producer_id)
+		if request.form['name']:
+			#print(request.form['name'])
+			producerToEdit.name = request.form['name']
+		session.add(producerToEdit)
+		session.commit()
+		return redirect(url_for('showProducers'))
+		#return "Editing producer {}".format(producer_id)
 	else:
 		return render_template('editproducer.html')
 		#return "This page will be for editing producer {}".format(producer_id)
 
 @app.route('/producer/<int:producer_id>/delete/', methods=['GET', 'POST'])
 def deleteProducer(producer_id):
+	producerToDelete = session.query(Producer).filter_by(id = producer_id).one()
 	if request.method == 'POST':
-		return "Deleting producer {}".format(producer_id)
+		#print(request.form['name'])
+		session.delete(producerToDelete)
+		session.commit()
+		return redirect(url_for('showProducers'))
+		#return "Deleting producer {}".format(producer_id)
 	else:
 		return render_template('deleteproducer.html')
 		#return "This page will be for deleting producer {}".format(producer_id)
