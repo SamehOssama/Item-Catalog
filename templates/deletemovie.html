@@ -4,9 +4,9 @@
 	<h1>Delete Movie Movie Name Here</h1>
 	<div>
 		<p>Are you sure you want to delete movie : Movie Name Here from "Producer Name Here"</p>
-		<form action="#" method="POST">
+		<form action="{{ url_for('deleteMovie') }}" method="POST">
 			<input type="submit" value="Delete">
 		</form>
-		<a href="#">Cancel</a>
+		<a href="{{ url_for('showMovies') }}}">Cancel</a>
 	</div>
 {% endblock %}
