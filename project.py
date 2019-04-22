@@ -13,6 +13,60 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
+@app.route('/')
+@app.route('/producer/')
+def showProducers():
+	return "This page will show all the producers"
+
+@app.route('/producer/new/', methods=['GET', 'POST'])
+def newProducer():
+	if request.method == 'POST':
+		return "Adding new producer"
+	else:
+		return "This page will be for adding a new producer"
+
+@app.route('/producer/<int:producer_id>/edit/', methods=['GET', 'POST'])
+def editProducer(producer_id):
+	if request.method == 'POST':
+		return "Editing producer {}".format(producer_id)
+	else:
+		return "This page will be for editing producer {}".format(producer_id)
+
+@app.route('/producer/<int:producer_id>/delete/', methods=['GET', 'POST'])
+def deleteProducer(producer_id):
+	if request.method == 'POST':
+		return "Deleting producer {}".format(producer_id)
+	else:
+		return "This page will be for deleting producer {}".format(producer_id)
+
+
+@app.route('/producer/<int:producer_id>/')
+@app.route('/producer/<int:producer_id>/movie/')
+def showMovies(producer_id):
+	return "This page is the movie list for producer {}".format(producer_id)
+
+@app.route('/producer/<int:producer_id>/movie/new/', methods=['GET', 'POST'])
+def newMovie(producer_id):
+	if request.method == 'POST':
+		return "Adding new movie for producer {}".format(producer_id)
+	else:
+		return "This page is for adding a new movie for producer {}".format(producer_id)
+
+@app.route('/producer/<int:producer_id>/movie/<int:movie_id>/edit/', methods=['GET', 'POST'])
+def editMovie(producer_id, movie_id):
+	if request.method == 'POST':
+		return "Editing movie {0} for produce {1}".format(movie_id, producer_id)
+	else:
+		return "This page is for editing movie {}".format(movie_id)
+
+@app.route('/producer/<int:producer_id>/movie/<int:movie_id>/delete/', methods=['GET', 'POST'])
+def deleteMovie(producer_id, movie_id):
+	if request.method == 'POST':
+		return "Deleting movie {0} for producer {1}".format(movie_id, producer_id)
+	else:
+		return "This page is for deleting movie {}".format(movie_id)
+
+
 @app.route('/api/producers/')
 def showProducersJSON():
 	producers = session.query(Producer).all()
@@ -25,7 +79,7 @@ def showMoviesJSON(producer_id):
 		# stop the database from updating the movies query
 		session.expunge(i) 
 		# change release date (date obj) to a readable date format
-		i.released = datetime.strftime(i.released, "%d %b %Y")
+		i.released = datetime.strftime(i.released, ".format(d .format(b .format(Y")
 	return jsonify(Movies=[i.serialize for i in movies])
 
 @app.route('/api/producers/<int:producer_id>/movies/<int:movie_id>/')
@@ -34,7 +88,7 @@ def showMovieJSON(producer_id, movie_id):
 	# stop the database from updating the movies query
 	session.expunge(movie)
 	# change release date (date obj) to a readable date format
-	movie.released = datetime.strftime(movie.released, "%d %b %Y")
+	movie.released = datetime.strftime(movie.released, ".format(d .format(b .format(Y")
 	return jsonify(Movie=movie.serialize)
 
 
