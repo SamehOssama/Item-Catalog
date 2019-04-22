@@ -17,7 +17,7 @@ session = DBSession()
 @app.route('/producer/')
 def showProducers():
 	producers = session.query(Producer).all()
-	return render_template('producers.html')
+	return render_template('producers.html', producers = producers)
 	#return "This page will show all the producers"
 
 @app.route('/producer/new/', methods=['GET', 'POST'])
@@ -34,8 +34,8 @@ def newProducer():
 		#return "This page will be for adding a new producer"
 
 @app.route('/producer/<int:producer_id>/edit/', methods=['GET', 'POST'])
-#producerToEdit = session.query(Producer).filter_by(id=producer_id).one()
 def editProducer(producer_id):
+	producerToEdit = session.query(Producer).filter_by(id=producer_id).one()
 	if request.method == 'POST':
 		if request.form['name']:
 			#print(request.form['name'])
@@ -45,7 +45,7 @@ def editProducer(producer_id):
 		return redirect(url_for('showProducers'))
 		#return "Editing producer {}".format(producer_id)
 	else:
-		return render_template('editproducer.html')
+		return render_template('editproducer.html', producer = producerToEdit)
 		#return "This page will be for editing producer {}".format(producer_id)
 
 @app.route('/producer/<int:producer_id>/delete/', methods=['GET', 'POST'])
@@ -58,7 +58,7 @@ def deleteProducer(producer_id):
 		return redirect(url_for('showProducers'))
 		#return "Deleting producer {}".format(producer_id)
 	else:
-		return render_template('deleteproducer.html')
+		return render_template('deleteproducer.html', producer = producerToDelete)
 		#return "This page will be for deleting producer {}".format(producer_id)
 
 
@@ -67,7 +67,7 @@ def deleteProducer(producer_id):
 def showMovies(producer_id):
 	producer = session.query(Producer).filter_by(id = producer_id).one()
 	movies = session.query(Movie).filter_by(producer_id = producer_id).order_by('released').all()
-	return render_template('movies.html')
+	return render_template('movies.html', producer = producer, movies = movies)
 	#return "This page is the movie list for producer {}".format(producer_id)
 
 @app.route('/producer/<int:producer_id>/movie/new/', methods=['GET', 'POST'])
@@ -92,7 +92,7 @@ def newMovie(producer_id):
 		return redirect(url_for('showMovies', producer_id = producer_id))
 		#return "Adding new movie for producer {}".format(producer_id)
 	else:
-		return render_template('newmovie.html')
+		return render_template('newmovie.html', producer = producer)
 		#return "This page is for adding a new movie for producer {}".format(producer_id)
 
 @app.route('/producer/<int:producer_id>/movie/<int:movie_id>/edit/', methods=['GET', 'POST'])
@@ -118,7 +118,7 @@ def editMovie(producer_id, movie_id):
 		return redirect(url_for('showMovies', producer_id = producer_id))
 		#return "Editing movie {0} for produce {1}".format(movie_id, producer_id)
 	else:
-		return render_template('editmovie.html')
+		return render_template('editmovie.html', producer = producer, movie = movieToEdit)
 		#return "This page is for editing movie {}".format(movie_id)
 
 @app.route('/producer/<int:producer_id>/movie/<int:movie_id>/delete/', methods=['GET', 'POST'])
@@ -132,7 +132,7 @@ def deleteMovie(producer_id, movie_id):
 		return redirect(url_for('showMovies', producer_id = producer_id))
 		#return "Deleting movie {0} for producer {1}".format(movie_id, producer_id)
 	else:
-		return render_template('deletemovie.html')
+		return render_template('deletemovie.html', producer = producer, movie = movieToDelete)
 		#return "This page is for deleting movie {}".format(movie_id)
 
 
