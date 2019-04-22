@@ -65,29 +65,72 @@ def deleteProducer(producer_id):
 @app.route('/producer/<int:producer_id>/')
 @app.route('/producer/<int:producer_id>/movie/')
 def showMovies(producer_id):
+	producer = session.query(Producer).filter_by(id = producer_id).one()
+	movies = session.query(Movie).filter_by(producer_id = producer_id).order_by('released').all()
 	return render_template('movies.html')
 	#return "This page is the movie list for producer {}".format(producer_id)
 
 @app.route('/producer/<int:producer_id>/movie/new/', methods=['GET', 'POST'])
 def newMovie(producer_id):
+	producer = session.query(Producer).filter_by(id = producer_id).one()
 	if request.method == 'POST':
-		return "Adding new movie for producer {}".format(producer_id)
+		newMovie = Movie(
+			name = request.form['name'], 
+			plot = request.form['plot'], 
+			runtime = request.form['runtime'], 
+			released = request.form['released'], 
+			poster = request.form['poster_url'], 
+			producer_id = producer_id)
+		session.add(newMovie)
+		session.commit()
+		# print('name = ' + request.form['name'])
+		# print('plot = ' + request.form['plot'])
+		# print('runtime = ' + str(request.form['runtime']))
+		# print('released = ' + request.form['released'])
+		# print('poster = ' + request.form['poster_url'])
+		# print('producer_id = ' + str(producer_id))
+		return redirect(url_for('showMovies', producer_id = producer_id))
+		#return "Adding new movie for producer {}".format(producer_id)
 	else:
 		return render_template('newmovie.html')
 		#return "This page is for adding a new movie for producer {}".format(producer_id)
 
 @app.route('/producer/<int:producer_id>/movie/<int:movie_id>/edit/', methods=['GET', 'POST'])
 def editMovie(producer_id, movie_id):
+	producer = session.query(Producer).filter_by(id = producer_id).one()
+	movieToEdit = session.query(Movie).filter_by(id = menu_id).one()
 	if request.method == 'POST':
-		return "Editing movie {0} for produce {1}".format(movie_id, producer_id)
+		post = request.form
+		if post['name'] and post['plot'] and post['runtime'] and post['released'] and post['poster_url']:
+			movieToEdit.name = post['name']
+			movieToEdit.plot = post['plot']
+			movieToEdit.runtime = post['runtime']
+			movieToEdit.released = post['released']
+			movieToEdit.poster = post['poster_url']
+		session.add(movieToEdit)
+		session.commit()
+		# print('name = ' + post['name'])
+		# print('plot = ' + post['plot'])
+		# print('runtime = ' + str(post['runtime']))
+		# print('released = ' + post['released'])
+		# print('poster = ' + post['poster_url'])
+		# print('producer_id = ' + str(producer_id))
+		return redirect(url_for('showMovies', producer_id = producer_id))
+		#return "Editing movie {0} for produce {1}".format(movie_id, producer_id)
 	else:
 		return render_template('editmovie.html')
 		#return "This page is for editing movie {}".format(movie_id)
 
 @app.route('/producer/<int:producer_id>/movie/<int:movie_id>/delete/', methods=['GET', 'POST'])
 def deleteMovie(producer_id, movie_id):
+	producer = session.query(Producer).filter_by(id = producer_id).one()
+	movieToDelete = session.query(Movie).filter_by(id = menu_id).one()
 	if request.method == 'POST':
-		return "Deleting movie {0} for producer {1}".format(movie_id, producer_id)
+		session.delete(movieToDelete)
+		session.commit()
+		#print(request.form['name'])
+		return redirect(url_for('showMovies', producer_id = producer_id))
+		#return "Deleting movie {0} for producer {1}".format(movie_id, producer_id)
 	else:
 		return render_template('deletemovie.html')
 		#return "This page is for deleting movie {}".format(movie_id)
