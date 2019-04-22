@@ -1,25 +1,31 @@
 {% extends "main.html" %}
 {% block title %}Movies{% endblock %}
 {% block body %}
-	<h1>Producer Name Here's movies</h1>
+	<h1>{{ producer.name }}'s movies</h1>
 	<div>
-		<a href="{{ url_for('newMovie') }}">Create a new movie</a>
+		<a href="{{ url_for('newMovie', producer_id = producer.id) }}">Create a new movie</a>
 		<div>
-			<p>
-				<img src="" alt="Movie Poster Unavailable">
-				<br>
-				name
-				<br>
-				plot
-				<br>
-				release date
-				<br>
-				runtime
-				<br>
-				<a href="{{ url_for('editMovie') }}">Edit Movie</a>
-				<br>
-				<a href="{{ url_for('deleteMovie') }}">Delete Movie</a></p>
-			</p>
+			{%if movies%}
+				{% for movie in movies %}
+					<p>
+						<img src="{{ movie.poster }}" alt="Movie Poster Unavailable">
+						<br>
+						{{ movie.name }}
+						<br>
+						{{ movie.plot }}
+						<br>
+						{{ movie.released }}
+						<br>
+						{{ movie.runtime }}
+						<br>
+						<a href="{{ url_for('editMovie', producer_id = producer.id, movie_id = movie.id) }}">Edit Movie</a>
+						<br>
+						<a href="{{ url_for('deleteMovie', producer_id = producer.id, movie_id = movie.id) }}">Delete Movie</a></p>
+					</p>
+				{% endfor %}
+			{%else%}
+				<h2>No movies available.</h2>
+			{%endif%}
 		</div>	
 	</div>
 {% endblock %}

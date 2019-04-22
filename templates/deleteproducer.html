@@ -1,10 +1,10 @@
 {% extends "main.html" %}
 {% block title %}Delete Producer{% endblock %}
 {% block body %}
-	<h1>Delete Producer Producer Name Here</h1>
+	<h1>Delete Producer {{ producer.name }}</h1>
 	<div>
-		<p>Are you sure you want to delete producer : Producer Name Here</p>
-		<form action="{{ url_for('deleteProducer') }}" method="POST">
+		<p>Are you sure you want to delete producer : {{ producer.name }}</p>
+		<form action="{{ url_for('deleteProducer', producer_id = producer.id) }}" method="POST">
 			<input type="submit" value="Delete">
 		</form>
 		<a href="{{ url_for('showProducers') }}">Cancel</a>

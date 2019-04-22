@@ -1,12 +1,12 @@
 {% extends "main.html" %}
 {% block title %}Delete Movie{% endblock %}
 {% block body %}
-	<h1>Delete Movie Movie Name Here</h1>
+	<h1>Delete Movie {{ movie.name }}</h1>
 	<div>
-		<p>Are you sure you want to delete movie : Movie Name Here from "Producer Name Here"</p>
-		<form action="{{ url_for('deleteMovie') }}" method="POST">
+		<p>Are you sure you want to delete movie : {{ movie.name }} from "{{ producer.name }}"</p>
+		<form action="{{ url_for('deleteMovie', producer_id = producer.id, movie_id = movie.id) }}" method="POST">
 			<input type="submit" value="Delete">
 		</form>
-		<a href="{{ url_for('showMovies') }}}">Cancel</a>
+		<a href="{{ url_for('showMovies', producer_id = producer.id) }}">Cancel</a>
 	</div>
 {% endblock %}

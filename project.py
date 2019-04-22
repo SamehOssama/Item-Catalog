@@ -98,7 +98,7 @@ def newMovie(producer_id):
 @app.route('/producer/<int:producer_id>/movie/<int:movie_id>/edit/', methods=['GET', 'POST'])
 def editMovie(producer_id, movie_id):
 	producer = session.query(Producer).filter_by(id = producer_id).one()
-	movieToEdit = session.query(Movie).filter_by(id = menu_id).one()
+	movieToEdit = session.query(Movie).filter_by(id = movie_id).one()
 	if request.method == 'POST':
 		post = request.form
 		if post['name'] and post['plot'] and post['runtime'] and post['released'] and post['poster_url']:
@@ -124,7 +124,7 @@ def editMovie(producer_id, movie_id):
 @app.route('/producer/<int:producer_id>/movie/<int:movie_id>/delete/', methods=['GET', 'POST'])
 def deleteMovie(producer_id, movie_id):
 	producer = session.query(Producer).filter_by(id = producer_id).one()
-	movieToDelete = session.query(Movie).filter_by(id = menu_id).one()
+	movieToDelete = session.query(Movie).filter_by(id = movie_id).one()
 	if request.method == 'POST':
 		session.delete(movieToDelete)
 		session.commit()

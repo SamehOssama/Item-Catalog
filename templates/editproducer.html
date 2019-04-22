@@ -1,11 +1,11 @@
 {% extends "main.html" %}
 {% block title %}Edit Producer{% endblock %}
 {% block body %}
-	<h1>Edit Producer Producer Name Here</h1>
+	<h1>Edit Producer {{ producer.name }}</h1>
 	<div>
 		<p>Name:</p>
-		<form action="{{ url_for('editProducer') }}" method="POST">
-			<input type="text" name="name" placeholder="producer name">
+		<form action="{{ url_for('editProducer', producer_id = producer.id) }}" method="POST">
+			<input type="text" name="name" placeholder="{{ producer.name }}">
 			<input type="submit" value="Edit">
 		</form>
 		<a href="{{ url_for('showProducers') }}">Cancel</a>
