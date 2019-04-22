@@ -5,12 +5,26 @@ from db_setup import Base, User, Producer, Movie
 
 from datetime import datetime
 
+from flask import session as login_session
+import random, string
+
 app = Flask(__name__)
 engine = create_engine('sqlite:///movies.db', connect_args={'check_same_thread': False})
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+
+# Create anti-forgery state token
+@app.route('/login/')
+def showLogin():
+	# Create anti-forgery state token
+	state = ''.join(random.choice(
+			string.ascii_uppercase + string.digits) for x in range(32))
+	login_session['state'] = state
+	print(state)
+	return render_template('login.html', STATE=state)
 
 
 @app.route('/')
