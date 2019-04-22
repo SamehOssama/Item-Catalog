@@ -16,55 +16,63 @@ session = DBSession()
 @app.route('/')
 @app.route('/producer/')
 def showProducers():
-	return "This page will show all the producers"
+	return render_template('producers.html')
+	#return "This page will show all the producers"
 
 @app.route('/producer/new/', methods=['GET', 'POST'])
 def newProducer():
 	if request.method == 'POST':
 		return "Adding new producer"
 	else:
-		return "This page will be for adding a new producer"
+		return render_template('newproducer.html')
+		#return "This page will be for adding a new producer"
 
 @app.route('/producer/<int:producer_id>/edit/', methods=['GET', 'POST'])
 def editProducer(producer_id):
 	if request.method == 'POST':
 		return "Editing producer {}".format(producer_id)
 	else:
-		return "This page will be for editing producer {}".format(producer_id)
+		return render_template('editproducer.html')
+		#return "This page will be for editing producer {}".format(producer_id)
 
 @app.route('/producer/<int:producer_id>/delete/', methods=['GET', 'POST'])
 def deleteProducer(producer_id):
 	if request.method == 'POST':
 		return "Deleting producer {}".format(producer_id)
 	else:
-		return "This page will be for deleting producer {}".format(producer_id)
+		return render_template('deleteproducer.html')
+		#return "This page will be for deleting producer {}".format(producer_id)
 
 
 @app.route('/producer/<int:producer_id>/')
 @app.route('/producer/<int:producer_id>/movie/')
 def showMovies(producer_id):
-	return "This page is the movie list for producer {}".format(producer_id)
+	return render_template('movies.html')
+	#return "This page is the movie list for producer {}".format(producer_id)
 
 @app.route('/producer/<int:producer_id>/movie/new/', methods=['GET', 'POST'])
 def newMovie(producer_id):
 	if request.method == 'POST':
 		return "Adding new movie for producer {}".format(producer_id)
 	else:
-		return "This page is for adding a new movie for producer {}".format(producer_id)
+		return render_template('newmovie.html')
+		#return "This page is for adding a new movie for producer {}".format(producer_id)
 
 @app.route('/producer/<int:producer_id>/movie/<int:movie_id>/edit/', methods=['GET', 'POST'])
 def editMovie(producer_id, movie_id):
 	if request.method == 'POST':
 		return "Editing movie {0} for produce {1}".format(movie_id, producer_id)
 	else:
-		return "This page is for editing movie {}".format(movie_id)
+		return render_template('editmovie.html')
+		#return "This page is for editing movie {}".format(movie_id)
 
 @app.route('/producer/<int:producer_id>/movie/<int:movie_id>/delete/', methods=['GET', 'POST'])
 def deleteMovie(producer_id, movie_id):
 	if request.method == 'POST':
 		return "Deleting movie {0} for producer {1}".format(movie_id, producer_id)
 	else:
-		return "This page is for deleting movie {}".format(movie_id)
+		return render_template('deletemovie.html')
+		#return "This page is for deleting movie {}".format(movie_id)
 
 
 @app.route('/api/producers/')
