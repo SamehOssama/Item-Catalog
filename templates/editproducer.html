@@ -4,10 +4,10 @@
 	<h1>Edit Producer Producer Name Here</h1>
 	<div>
 		<p>Name:</p>
-		<form action="#" method="POST">
+		<form action="{{ url_for('editProducer') }}" method="POST">
 			<input type="text" name="name" placeholder="producer name">
 			<input type="submit" value="Edit">
 		</form>
-		<a href="#">Cancel</a>
+		<a href="{{ url_for('showProducers') }}">Cancel</a>
 	</div>
 {% endblock %}

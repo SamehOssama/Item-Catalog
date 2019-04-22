@@ -4,9 +4,9 @@
 	<h1>Delete Producer Producer Name Here</h1>
 	<div>
 		<p>Are you sure you want to delete producer : Producer Name Here</p>
-		<form action="#" method="POST">
+		<form action="{{ url_for('deleteProducer') }}" method="POST">
 			<input type="submit" value="Delete">
 		</form>
-		<a href="#">Cancel</a>
+		<a href="{{ url_for('showProducers') }}">Cancel</a>
 	</div>
 {% endblock %}

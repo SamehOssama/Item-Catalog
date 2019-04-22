@@ -3,14 +3,14 @@
 {% block body %}
 	<div>
 		<h1>Producers</h1>
-		<a href="#">Create New Producer</a>
+		<a href="{{ url_for('newProducer') }}">Create New Producer</a>
 		<div>
 			<p>
-				<a href="#">Producer name</a>
+				<a href="{{ url_for('showMovies') }}">Producer name</a>
 				<br>
-				<a href="#">Edit Producer</a>
+				<a href="{{ url_for('editProducer') }}">Edit Producer</a>
 				<br>
-				<a href="#">Delete Producer</a>
+				<a href="{{ url_for('deleteProducer') }}">Delete Producer</a>
 			</p>
 		</div>
 	</div>
