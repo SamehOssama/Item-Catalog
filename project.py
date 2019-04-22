@@ -8,12 +8,26 @@ from datetime import datetime
 from flask import session as login_session
 import random, string
 
+from oauth2client.client import flow_from_clientsecrets
+from oauth2client.client import FlowExchangeError
+
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+
+import httplib2
+import json
+from flask import make_response
+import requests
+
 app = Flask(__name__)
 engine = create_engine('sqlite:///movies.db', connect_args={'check_same_thread': False})
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
+APPLICATION_NAME = "Producer Menu Application"
 
 
 # Create anti-forgery state token
@@ -25,6 +39,67 @@ def showLogin():
 	login_session['state'] = state
 	print(state)
 	return render_template('login.html', STATE=state)
+
+#GOOGLE Sign-IN
+
+@app.route('/gconnect', methods=['POST'])
+def gconnect():
+	# Validate state token
+	print("GCONNECT")
+	if request.args.get('state') != login_session.get('state'):
+		print("COMPARE STATES")
+		print(request.args.get('state'))
+		print(login_session.get('state'))
+		response = make_response(json.dumps('Invalid state parameter.'), 401)
+		response.headers['Content-Type'] = 'application/json'
+		return response
+	# Obtain authorization code
+	token = request.data
+
+	try:
+		# Specify the CLIENT_ID of the app that accesses the backend:
+		print("checking ID Info")
+		print("Token = " + token)
+		print("Request = ")
+		print(google_requests.Request())
+		print("ID = " + CLIENT_ID)
+		idinfo = id_token.verify_oauth2_token(
+			token, google_requests.Request(), CLIENT_ID)
+		print("ID info = ")
+		print(idinfo)
+		if idinfo['iss'] not in ['accounts.google.com',
+								 'https://accounts.google.com']:
+			print("Could not verify audience.")
+			response = make_response(json.dumps(
+				"Could not verify audience."), 401)
+
+		# ID token is valid.
+		# Get the user's Google Account ID from the decoded token.
+		print("ID token is valid")
+		username = idinfo['name']
+		useremail = idinfo['email']
+		userpicture = idinfo['picture']
+		print("Verification: \nUsername = " + username + "\nuseremail = " + useremail + "\nuserpicture = " + userpicture)
+
+	except ValueError:
+		# Invalid token
+		response = make_response(json.dumps("Invalid token."), 401)
+		print("Invalid token.")
+
+	login_session['access_token'] = token
+
+	login_session['username'] = username
+	login_session['picture'] = userpicture
+	login_session['email'] = useremail
+	# ADD PROVIDER TO LOGIN SESSION
+	login_session['provider'] = 'google'
+
+	output = ''
+	output += '<h1>Welcome,'
+	output += login_session['username']
+	output += '!</h1>'
+	print("done!")
+	return output
 
 
 @app.route('/')
