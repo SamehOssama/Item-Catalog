@@ -148,7 +148,7 @@ def showMoviesJSON(producer_id):
 		# stop the database from updating the movies query
 		session.expunge(i) 
 		# change release date (date obj) to a readable date format
-		i.released = datetime.strftime(i.released, ".format(d .format(b .format(Y")
+		i.released = datetime.strftime(i.released, "%d %b %Y")
 	return jsonify(Movies=[i.serialize for i in movies])
 
 @app.route('/api/producers/<int:producer_id>/movies/<int:movie_id>/')
@@ -157,7 +157,7 @@ def showMovieJSON(producer_id, movie_id):
 	# stop the database from updating the movies query
 	session.expunge(movie)
 	# change release date (date obj) to a readable date format
-	movie.released = datetime.strftime(movie.released, ".format(d .format(b .format(Y")
+	movie.released = datetime.strftime(movie.released, "%d %b %Y")
 	return jsonify(Movie=movie.serialize)
 
 
