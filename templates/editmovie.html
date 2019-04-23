@@ -10,7 +10,7 @@
 			Release date:	<br><input type="date" name="released" value="{{ movie.released }}"><br>
 			runtime:	<br><input type="text" size="4" name="runtime" placeholder="{{ movie.runtime }}" maxlength="4">
 			<button disabled>min</button><br>
-			<input type="submit" value="Create">
+			<input type="submit" value="Edit">
 		</form>
 		<a href="{{ url_for('showMovies', producer_id = producer.id) }}">Cancel</a>
 	</div>
