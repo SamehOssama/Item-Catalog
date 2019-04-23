@@ -206,7 +206,7 @@ def newMovie(producer_id):
 			name = request.form['name'], 
 			plot = request.form['plot'], 
 			runtime = request.form['runtime'], 
-			released = request.form['released'], 
+			released = datetime.strptime(request.form['released'], '%Y-%m-%d'), 
 			poster = request.form['poster'], 
 			producer_id = producer_id)
 		session.add(newMovie)
@@ -233,7 +233,7 @@ def editMovie(producer_id, movie_id):
 			movieToEdit.name = post['name']
 			movieToEdit.plot = post['plot']
 			movieToEdit.runtime = post['runtime']
-			movieToEdit.released = post['released']
+			movieToEdit.released = datetime.strptime(post['released'], '%Y-%m-%d')
 			movieToEdit.poster = post['poster']
 		session.add(movieToEdit)
 		session.commit()
