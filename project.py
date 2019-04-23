@@ -30,6 +30,19 @@ CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_i
 APPLICATION_NAME = "Producer Menu Application"
 
 
+def toDateStr(DB_output):
+	""" Stop the database from updating the DB query 
+	And change release date (date obj) to a readable date format. """
+	strformat = '%d %b %Y'
+	if isinstance(DB_output, list):# check to see if input is one column
+		for i in DB_output:
+			session.expunge(i)
+			i.released = datetime.strftime(i.released, strformat)
+	elif isinstance(DB_output, object):# check to see if input is multiple columns
+		session.expunge(DB_output) 
+		DB_output.released = datetime.strftime(DB_output.released, strformat)
+
+
 # Create anti-forgery state token
 @app.route('/login/')
 def showLogin():
@@ -181,6 +194,7 @@ def deleteProducer(producer_id):
 def showMovies(producer_id):
 	producer = session.query(Producer).filter_by(id = producer_id).one()
 	movies = session.query(Movie).filter_by(producer_id = producer_id).order_by('released').all()
+	toDateStr(movies)
 	return render_template('movies.html', producer = producer, movies = movies, STATE=login_session.get('state'))
 	#return "This page is the movie list for producer {}".format(producer_id)
 
@@ -258,20 +272,13 @@ def showProducersJSON():
 @app.route('/api/producers/<int:producer_id>/movies/')
 def showMoviesJSON(producer_id):
 	movies = session.query(Movie).filter_by(producer_id = producer_id).all()
-	for i in movies:
-		# stop the database from updating the movies query
-		session.expunge(i) 
-		# change release date (date obj) to a readable date format
-		i.released = datetime.strftime(i.released, "%d %b %Y")
+	toDateStr(movies)
 	return jsonify(Movies=[i.serialize for i in movies])
 
 @app.route('/api/producers/<int:producer_id>/movies/<int:movie_id>/')
 def showMovieJSON(producer_id, movie_id):
 	movie = session.query(Movie).filter_by(id = movie_id).one()
-	# stop the database from updating the movies query
-	session.expunge(movie)
-	# change release date (date obj) to a readable date format
-	movie.released = datetime.strftime(movie.released, "%d %b %Y")
+	toDateStr(movie)
 	return jsonify(Movie=movie.serialize)
 
 
