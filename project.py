@@ -38,7 +38,7 @@ def showLogin():
 			string.ascii_uppercase + string.digits) for x in range(32))
 	login_session['state'] = state
 	print(state)
-	return render_template('login.html', STATE=state)
+	return render_template('login.html', STATE = state)
 
 #GOOGLE Sign-IN
 
@@ -101,12 +101,37 @@ def gconnect():
 	print("done!")
 	return output
 
+@app.route('/disconnect')
+def disconnect():
+	if request.args.get('state') != login_session.get('state'):
+		response = make_response(json.dumps('Invalid state parameter.'), 401)
+		response.headers['Content-Type'] = 'application/json'
+		return response
+	print("DISCONNECT")
+	if 'provider' in login_session:
+		if login_session['provider'] == 'google':
+			print('logging out of google')
+			response = make_response(json.dumps('Successfully disconnected from Google.'), 200)
+			response.headers['Content-Type'] = 'application/json'
+			del login_session['provider']
+			del login_session['username']
+			del login_session['email']
+			del login_session['picture']
+			del login_session['access_token']
+			del login_session['state']
+			print("DELETED EVRYTHING")
+	else :
+		print("Not Logged In")
+		redirect(url_for('showProducers'))
+	return redirect(url_for('showProducers'))
+
 
 @app.route('/')
 @app.route('/producer/')
 def showProducers():
+	print(login_session)
 	producers = session.query(Producer).all()
-	return render_template('producers.html', producers = producers)
+	return render_template('producers.html', producers = producers, STATE = login_session.get('state'))
 	#return "This page will show all the producers"
 
 @app.route('/producer/new/', methods=['GET', 'POST'])
@@ -119,7 +144,7 @@ def newProducer():
 		return redirect(url_for('showProducers'))
 		#return "Adding new producer"
 	else:
-		return render_template('newproducer.html')
+		return render_template('newproducer.html', STATE = login_session.get('state'))
 		#return "This page will be for adding a new producer"
 
 @app.route('/producer/<int:producer_id>/edit/', methods=['GET', 'POST'])
@@ -134,7 +159,7 @@ def editProducer(producer_id):
 		return redirect(url_for('showProducers'))
 		#return "Editing producer {}".format(producer_id)
 	else:
-		return render_template('editproducer.html', producer = producerToEdit)
+		return render_template('editproducer.html', producer = producerToEdit, STATE = login_session.get('state'))
 		#return "This page will be for editing producer {}".format(producer_id)
 
 @app.route('/producer/<int:producer_id>/delete/', methods=['GET', 'POST'])
@@ -147,7 +172,7 @@ def deleteProducer(producer_id):
 		return redirect(url_for('showProducers'))
 		#return "Deleting producer {}".format(producer_id)
 	else:
-		return render_template('deleteproducer.html', producer = producerToDelete)
+		return render_template('deleteproducer.html', producer = producerToDelete, STATE=login_session.get('state'))
 		#return "This page will be for deleting producer {}".format(producer_id)
 
 
@@ -156,7 +181,7 @@ def deleteProducer(producer_id):
 def showMovies(producer_id):
 	producer = session.query(Producer).filter_by(id = producer_id).one()
 	movies = session.query(Movie).filter_by(producer_id = producer_id).order_by('released').all()
-	return render_template('movies.html', producer = producer, movies = movies)
+	return render_template('movies.html', producer = producer, movies = movies, STATE=login_session.get('state'))
 	#return "This page is the movie list for producer {}".format(producer_id)
 
 @app.route('/producer/<int:producer_id>/movie/new/', methods=['GET', 'POST'])
@@ -181,7 +206,7 @@ def newMovie(producer_id):
 		return redirect(url_for('showMovies', producer_id = producer_id))
 		#return "Adding new movie for producer {}".format(producer_id)
 	else:
-		return render_template('newmovie.html', producer = producer)
+		return render_template('newmovie.html', producer = producer, STATE=login_session.get('state'))
 		#return "This page is for adding a new movie for producer {}".format(producer_id)
 
 @app.route('/producer/<int:producer_id>/movie/<int:movie_id>/edit/', methods=['GET', 'POST'])
@@ -207,7 +232,7 @@ def editMovie(producer_id, movie_id):
 		return redirect(url_for('showMovies', producer_id = producer_id))
 		#return "Editing movie {0} for produce {1}".format(movie_id, producer_id)
 	else:
-		return render_template('editmovie.html', producer = producer, movie = movieToEdit)
+		return render_template('editmovie.html', producer = producer, movie = movieToEdit, STATE = login_session.get('state'))
 		#return "This page is for editing movie {}".format(movie_id)
 
 @app.route('/producer/<int:producer_id>/movie/<int:movie_id>/delete/', methods=['GET', 'POST'])
@@ -221,7 +246,7 @@ def deleteMovie(producer_id, movie_id):
 		return redirect(url_for('showMovies', producer_id = producer_id))
 		#return "Deleting movie {0} for producer {1}".format(movie_id, producer_id)
 	else:
-		return render_template('deletemovie.html', producer = producer, movie = movieToDelete)
+		return render_template('deletemovie.html', producer = producer, movie = movieToDelete, STATE = login_session.get('state'))
 		#return "This page is for deleting movie {}".format(movie_id)
 
 
