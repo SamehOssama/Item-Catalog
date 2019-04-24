@@ -204,7 +204,7 @@ def newProducer():
 		return redirect(url_for('showLogin'))
 	if request.method == 'POST':
 		#print(request.form['name'])
-		newProducer = Producer(name = request.form['name'])
+		newProducer = Producer(name = request.form['name'], user_id = login_session['user_id'])
 		session.add(newProducer)
 		session.commit()
 		flash('New Producer {} Successfully Created'.format(newProducer.name))
@@ -295,7 +295,8 @@ def newMovie(producer_id):
 			runtime = request.form['runtime'], 
 			released = datetime.strptime(request.form['released'], '%Y-%m-%d'), 
 			poster = request.form['poster'], 
-			producer_id = producer_id)
+			producer_id = producer_id,
+			user_id = login_session['user_id'])
 		session.add(newMovie)
 		session.commit()
 		# print('name = ' + request.form['name'])
