@@ -219,6 +219,16 @@ def editProducer(producer_id):
 	if 'username' not in login_session:
 		return redirect(url_for('showLogin'))
 	producerToEdit = session.query(Producer).filter_by(id=producer_id).one()
+	if producerToEdit.user_id != login_session['user_id']:
+		return """
+		<script>
+			function myFunction() {
+				alert('You are not authorized to edit this producer. Please add your own producer in order to delete.');
+				window.location.href = '/producer';
+			}
+		</script>
+		<body onload='myFunction()'>
+		"""
 	if request.method == 'POST':
 		if request.form['name']:
 			#print(request.form['name'])
@@ -237,6 +247,16 @@ def deleteProducer(producer_id):
 	if 'username' not in login_session:
 		return redirect(url_for('showLogin'))
 	producerToDelete = session.query(Producer).filter_by(id = producer_id).one()
+	if producerToDelete.user_id != login_session['user_id']:
+		return """
+		<script>
+			function myFunction() {
+				alert('You are not authorized to delete this producer. Please add your own producer in order to delete.');
+				window.location.href = '/producer';
+			}
+		</script>
+		<body onload='myFunction()'>
+		"""
 	if request.method == 'POST':
 		#print(request.form['name'])
 		session.delete(producerToDelete)
@@ -296,6 +316,16 @@ def editMovie(producer_id, movie_id):
 		return redirect(url_for('showLogin'))
 	producer = session.query(Producer).filter_by(id = producer_id).one()
 	movieToEdit = session.query(Movie).filter_by(id = movie_id).one()
+	if movieToEdit.user_id != login_session['user_id']:
+		return """
+		<script>
+			function myFunction() {
+				alert('You are not authorized to edit movies from this producer. Please add your own producer in order to edit movies.');
+				window.location.href = '/producer';
+			}
+		</script>
+		<body onload='myFunction()'>
+		"""
 	if request.method == 'POST':
 		post = request.form
 		#check if runtime is empty or an int value
@@ -324,6 +354,16 @@ def deleteMovie(producer_id, movie_id):
 		return redirect(url_for('showLogin'))
 	producer = session.query(Producer).filter_by(id = producer_id).one()
 	movieToDelete = session.query(Movie).filter_by(id = movie_id).one()
+	if movieToDelete.user_id != login_session['user_id']:
+		return """
+		<script>
+			function myFunction() {
+				alert('You are not authorized to delte movies from this producer. Please add your own producer in order to delete movies.');
+				window.location.href = '/producer';
+			}
+		</script>
+		<body onload='myFunction()'>
+		"""
 	if request.method == 'POST':
 		session.delete(movieToDelete)
 		session.commit()
