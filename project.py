@@ -247,6 +247,9 @@ def editMovie(producer_id, movie_id):
 	movieToEdit = session.query(Movie).filter_by(id = movie_id).one()
 	if request.method == 'POST':
 		post = request.form
+		#check if runtime is empty or an int value
+		if post['runtime'] and not post['runtime'].isdigit():
+			return render_template('editmovie.html', producer = producer, movie = movieToEdit, STATE = login_session.get('state'))
 		checkForUpdate(movieToEdit, post)
 		session.add(movieToEdit)
 		session.commit()
