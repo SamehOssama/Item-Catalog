@@ -260,6 +260,9 @@ def deleteProducer(producer_id):
 	if request.method == 'POST':
 		#print(request.form['name'])
 		session.delete(producerToDelete)
+		producerMovies = session.query(Movie).filter_by(producer_id = producer_id).all()
+		for i in producerMovies:
+			session.delete(i)
 		session.commit()
 		flash('Producer Successfully Deleted')
 		return redirect(url_for('showProducers'))
