@@ -111,7 +111,7 @@ def gconnect():
 	try:
 		# Specify the CLIENT_ID of the app that accesses the backend:
 		print("checking ID Info")
-		print("Token = " + token)
+		print("Token = " + token.decode())
 		print("Request = ")
 		print(google_requests.Request())
 		print("ID = " + CLIENT_ID)
