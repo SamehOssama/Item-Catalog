@@ -48,7 +48,7 @@ def checkForUpdate(oldValue, newValue):
 	then only update the values that have changed and not left empty
 	
 	Parameters: 
-    oldValue (obj): takes data from the DB
+	oldValue (obj): takes data from the DB
 	newValue (ImmutableMultiDict): takes data from post request
 	"""
 
@@ -192,11 +192,16 @@ def disconnect():
 def showProducers():
 	print(login_session)
 	producers = session.query(Producer).all()
-	return render_template('producers.html', producers = producers, STATE = login_session.get('state'))
+	if 'username' not in login_session:
+		return render_template('public_producers.html', producers = producers)
+	else:
+		return render_template('producers.html', producers = producers, STATE = login_session.get('state'))
 	#return "This page will show all the producers"
 
 @app.route('/producer/new/', methods=['GET', 'POST'])
 def newProducer():
+	if 'username' not in login_session:
+		return redirect(url_for('showLogin'))
 	if request.method == 'POST':
 		#print(request.form['name'])
 		newProducer = Producer(name = request.form['name'])
@@ -211,6 +216,8 @@ def newProducer():
 
 @app.route('/producer/<int:producer_id>/edit/', methods=['GET', 'POST'])
 def editProducer(producer_id):
+	if 'username' not in login_session:
+		return redirect(url_for('showLogin'))
 	producerToEdit = session.query(Producer).filter_by(id=producer_id).one()
 	if request.method == 'POST':
 		if request.form['name']:
@@ -227,6 +234,8 @@ def editProducer(producer_id):
 
 @app.route('/producer/<int:producer_id>/delete/', methods=['GET', 'POST'])
 def deleteProducer(producer_id):
+	if 'username' not in login_session:
+		return redirect(url_for('showLogin'))
 	producerToDelete = session.query(Producer).filter_by(id = producer_id).one()
 	if request.method == 'POST':
 		#print(request.form['name'])
@@ -244,13 +253,19 @@ def deleteProducer(producer_id):
 @app.route('/producer/<int:producer_id>/movie/')
 def showMovies(producer_id):
 	producer = session.query(Producer).filter_by(id = producer_id).one()
+	creator = getUserInfo(producer.user_id)
 	movies = session.query(Movie).filter_by(producer_id = producer_id).order_by('released').all()
 	toDateStr(movies)
-	return render_template('movies.html', producer = producer, movies = movies, STATE=login_session.get('state'))
+	if 'username' not in login_session or creator.id != login_session['user_id']:
+		return render_template('public_movies.html', producer = producer, movies = movies, creator=creator)
+	else:
+		return render_template('movies.html', producer = producer, movies = movies, STATE=login_session.get('state'))
 	#return "This page is the movie list for producer {}".format(producer_id)
 
 @app.route('/producer/<int:producer_id>/movie/new/', methods=['GET', 'POST'])
 def newMovie(producer_id):
+	if 'username' not in login_session:
+		return redirect(url_for('showLogin'))
 	producer = session.query(Producer).filter_by(id = producer_id).one()
 	if request.method == 'POST':
 		newMovie = Movie(
@@ -277,6 +292,8 @@ def newMovie(producer_id):
 
 @app.route('/producer/<int:producer_id>/movie/<int:movie_id>/edit/', methods=['GET', 'POST'])
 def editMovie(producer_id, movie_id):
+	if 'username' not in login_session:
+		return redirect(url_for('showLogin'))
 	producer = session.query(Producer).filter_by(id = producer_id).one()
 	movieToEdit = session.query(Movie).filter_by(id = movie_id).one()
 	if request.method == 'POST':
@@ -303,6 +320,8 @@ def editMovie(producer_id, movie_id):
 
 @app.route('/producer/<int:producer_id>/movie/<int:movie_id>/delete/', methods=['GET', 'POST'])
 def deleteMovie(producer_id, movie_id):
+	if 'username' not in login_session:
+		return redirect(url_for('showLogin'))
 	producer = session.query(Producer).filter_by(id = producer_id).one()
 	movieToDelete = session.query(Movie).filter_by(id = movie_id).one()
 	if request.method == 'POST':
