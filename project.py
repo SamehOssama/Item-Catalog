@@ -130,6 +130,7 @@ def gconnect():
 	output += login_session['username']
 	output += '!</h1>'
 	print("done!")
+	flash("You Are Now Logged In As {}.".format(login_session['username']))
 	return output
 
 @app.route('/disconnect')
@@ -151,8 +152,10 @@ def disconnect():
 			del login_session['access_token']
 			del login_session['state']
 			print("DELETED EVRYTHING")
+			flash("You Have Successfully Been Signed Out From Google")
 	else :
 		print("Not Logged In")
+		flash("You Were Not Logged In To Begin With!")
 		redirect(url_for('showProducers'))
 	return redirect(url_for('showProducers'))
 
@@ -172,6 +175,7 @@ def newProducer():
 		newProducer = Producer(name = request.form['name'])
 		session.add(newProducer)
 		session.commit()
+		flash('New Producer {} Successfully Created'.format(newProducer.name))
 		return redirect(url_for('showProducers'))
 		#return "Adding new producer"
 	else:
@@ -187,6 +191,7 @@ def editProducer(producer_id):
 			producerToEdit.name = request.form['name']
 		session.add(producerToEdit)
 		session.commit()
+		flash('Producer Successfully Edited')
 		return redirect(url_for('showProducers'))
 		#return "Editing producer {}".format(producer_id)
 	else:
@@ -200,6 +205,7 @@ def deleteProducer(producer_id):
 		#print(request.form['name'])
 		session.delete(producerToDelete)
 		session.commit()
+		flash('Producer Successfully Deleted')
 		return redirect(url_for('showProducers'))
 		#return "Deleting producer {}".format(producer_id)
 	else:
@@ -235,6 +241,7 @@ def newMovie(producer_id):
 		# print('released = ' + request.form['released'])
 		# print('poster = ' + request.form['poster_url'])
 		# print('producer_id = ' + str(producer_id))
+		flash('New Movie {0} Successfully Created for Producer {1}'.format(newMovie.name, producer.name))
 		return redirect(url_for('showMovies', producer_id = producer_id))
 		#return "Adding new movie for producer {}".format(producer_id)
 	else:
@@ -249,6 +256,7 @@ def editMovie(producer_id, movie_id):
 		post = request.form
 		#check if runtime is empty or an int value
 		if post['runtime'] and not post['runtime'].isdigit():
+			flash("Runtime Should Be A Number Or Left Empty")
 			return render_template('editmovie.html', producer = producer, movie = movieToEdit, STATE = login_session.get('state'))
 		checkForUpdate(movieToEdit, post)
 		session.add(movieToEdit)
@@ -259,6 +267,7 @@ def editMovie(producer_id, movie_id):
 		# print('released = ' + post['released'])
 		# print('poster = ' + post['poster_url'])
 		# print('producer_id = ' + str(producer_id))
+		flash('Movie Successfully Edited')
 		return redirect(url_for('showMovies', producer_id = producer_id))
 		#return "Editing movie {0} for produce {1}".format(movie_id, producer_id)
 	else:
@@ -273,6 +282,7 @@ def deleteMovie(producer_id, movie_id):
 		session.delete(movieToDelete)
 		session.commit()
 		#print(request.form['name'])
+		flash('Movie Successfully Deleted')
 		return redirect(url_for('showMovies', producer_id = producer_id))
 		#return "Deleting movie {0} for producer {1}".format(movie_id, producer_id)
 	else:
