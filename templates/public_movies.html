@@ -1,0 +1,27 @@
+{% extends "main.html" %}
+{% block title %}Movies{% endblock %}
+{% block body %}
+	<div>
+		<h1>{{ producer.name }}'s movies</h1>
+		<div>
+			{%if movies%}
+				{% for movie in movies %}
+					<p>
+						<img src="{{ movie.poster }}" alt="Movie Poster Unavailable" width="300px" height="445px">
+						<br>
+						{{ movie.name }}
+						<br>
+						{{ movie.plot }}
+						<br>
+						{{ movie.released }}
+						<br>
+						{{ movie.runtime }}
+						<br>
+					</p>
+				{% endfor %}
+			{%else%}
+				<h2>No movies available.</h2>
+			{%endif%}
+		</div>
+	</div>
+{% endblock %}

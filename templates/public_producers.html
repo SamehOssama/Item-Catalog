@@ -1,0 +1,18 @@
+{% extends "main.html" %}
+{% block title %}Producers{% endblock %}
+{% block body %}
+	<div>
+		<h1>Producers</h1>
+		<div>
+			{%if producers%}
+				{% for producer in producers %}
+					<p>
+						<a href="{{ url_for('showMovies', producer_id = producer.id) }}">{{ producer.name }}</a>
+					</p>
+				{% endfor %}
+			{%else%}
+				<h2>No producers available.</h2>
+			{%endif%}
+		</div>
+	</div>
+{% endblock %}
