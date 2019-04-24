@@ -42,6 +42,24 @@ def toDateStr(DB_output):
 		session.expunge(DB_output) 
 		DB_output.released = datetime.strftime(DB_output.released, strformat)
 
+def checkForUpdate(oldValue, newValue):
+	""" 
+	Takes the new values from post rquest and run them against the current ones
+	then only update the values that have changed and not left empty
+	
+	Parameters: 
+    oldValue (obj): takes data from the DB
+	newValue (ImmutableMultiDict): takes data from post request
+	"""
+
+	intersection = oldValue.__dict__.keys() & newValue.to_dict().keys()
+	#session.expunge(oldValue)
+	for i in intersection:
+		if oldValue.__getattribute__(i) != newValue[i] and newValue[i] != "":
+			oldValue.__setattr__(i, newValue[i])
+	# change date format from str to date obj
+	oldValue.__setattr__('released', datetime.strptime(newValue['released'], '%Y-%m-%d'))
+
 
 # Create anti-forgery state token
 @app.route('/login/')
@@ -229,12 +247,7 @@ def editMovie(producer_id, movie_id):
 	movieToEdit = session.query(Movie).filter_by(id = movie_id).one()
 	if request.method == 'POST':
 		post = request.form
-		if post['name'] and post['plot'] and post['runtime'] and post['released'] and post['poster_url']:
-			movieToEdit.name = post['name']
-			movieToEdit.plot = post['plot']
-			movieToEdit.runtime = post['runtime']
-			movieToEdit.released = datetime.strptime(post['released'], '%Y-%m-%d')
-			movieToEdit.poster = post['poster']
+		checkForUpdate(movieToEdit, post)
 		session.add(movieToEdit)
 		session.commit()
 		# print('name = ' + post['name'])
