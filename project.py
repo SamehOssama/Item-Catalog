@@ -275,11 +275,12 @@ def showMovies(producer_id):
 	producer = session.query(Producer).filter_by(id = producer_id).one()
 	creator = getUserInfo(producer.user_id)
 	movies = session.query(Movie).filter_by(producer_id = producer_id).order_by('released').all()
+	count = session.query(Movie).filter_by(producer_id = producer_id).count()
 	toDateStr(movies)
 	if 'username' not in login_session or creator.id != login_session['user_id']:
-		return render_template('public_movies.html', producer = producer, movies = movies, creator=creator)
+		return render_template('public_movies.html', producer = producer, movies = movies, count = count, creator=creator)
 	else:
-		return render_template('movies.html', producer = producer, movies = movies, STATE=login_session.get('state'))
+		return render_template('movies.html', producer = producer, movies = movies, count = count,STATE=login_session.get('state'))
 	#return "This page is the movie list for producer {}".format(producer_id)
 
 @app.route('/producer/<int:producer_id>/movie/new/', methods=['GET', 'POST'])
