@@ -1,27 +1,29 @@
 {% extends "main.html" %}
 {% block title %}Movies{% endblock %}
 {% block body %}
+	<h1>{{ producer.name }}'s movies ({{ count }} Movies)</h1>
 	<div>
-		<h1>{{ producer.name }}'s movies ({{ count }} Movies)</h1>
-		<div>
-			{%if movies%}
-				{% for movie in movies %}
-					<p>
-						<img src="{{ movie.poster }}" alt="Movie Poster Unavailable" width="300px" height="445px">
-						<br>
-						{{ movie.name }}
-						<br>
-						{{ movie.plot }}
-						<br>
-						{{ movie.released }}
-						<br>
-						{{ movie.runtime }}
-						<br>
-					</p>
-				{% endfor %}
-			{%else%}
-				<h2>No movies available.</h2>
-			{%endif%}
-		</div>
-	</div>
+		{%if movies%}
+			{% for movie in movies %}
+				<p>
+					<img src="{{ movie.poster }}" alt="Movie Poster Unavailable" width="300px" height="445px" id="poster{{ movie.id }}" onerror="standby({{ movie.id }})">
+					<br>
+					{{ movie.name }}
+					<br>
+					{{ movie.plot }}
+					<br>
+					{{ movie.released }}
+					<br>
+					{{ movie.runtime }} min
+				</p>
+			{% endfor %}
+		{%else%}
+			<h2>No movies available.</h2>
+		{%endif%}
+	</div>	
+	<script>
+		function standby(id) {
+	    	document.getElementById('poster'+id).src = 'http://media1.myfolio.com/users/getrnd/images/mkay4a6gy1.jpg'
+		}
+	</script>
 {% endblock %}

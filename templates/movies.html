@@ -8,7 +8,7 @@
 			{%if movies%}
 				{% for movie in movies %}
 					<p>
-						<img src="{{ movie.poster }}" alt="Movie Poster Unavailable" width="300px" height="445px">
+						<img src="{{ movie.poster }}" alt="Movie Poster Unavailable" width="300px" height="445px" id="poster{{ movie.id }}" onerror="standby({{ movie.id }})">
 						<br>
 						{{ movie.name }}
 						<br>
@@ -16,11 +16,11 @@
 						<br>
 						{{ movie.released }}
 						<br>
-						{{ movie.runtime }}
+						{{ movie.runtime }} min
 						<br>
 						<a href="{{ url_for('editMovie', producer_id = producer.id, movie_id = movie.id) }}">Edit Movie</a>
 						<br>
-						<a href="{{ url_for('deleteMovie', producer_id = producer.id, movie_id = movie.id) }}">Delete Movie</a></p>
+						<a href="{{ url_for('deleteMovie', producer_id = producer.id, movie_id = movie.id) }}">Delete Movie</a>
 					</p>
 				{% endfor %}
 			{%else%}
@@ -28,4 +28,9 @@
 			{%endif%}
 		</div>	
 	</div>
+	<script>
+		function standby(id) {
+	    	document.getElementById('poster'+id).src = 'http://media1.myfolio.com/users/getrnd/images/mkay4a6gy1.jpg'
+		}
+	</script>
 {% endblock %}
