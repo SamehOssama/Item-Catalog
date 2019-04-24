@@ -44,9 +44,9 @@ class Movie(Base):
 	runtime = Column(Integer)
 	released = Column(Date)
 	poster = Column(String(250))
-	producer_id = Column(Integer,ForeignKey('producer.id', onupdate="CASCADE", ondelete="CASCADE"))
+	producer_id = Column(Integer,ForeignKey('producer.id'))
 	producer = relationship(Producer) 
-	user_id = Column(Integer, ForeignKey('user.id', onupdate="CASCADE", ondelete="CASCADE"))
+	user_id = Column(Integer, ForeignKey('user.id'))
 	user = relationship(User)
 	 
 	# We added this serialize function to be able to send JSON objects in a serializable format
