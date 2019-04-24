@@ -60,6 +60,27 @@ def checkForUpdate(oldValue, newValue):
 	# change date format from str to date obj
 	oldValue.__setattr__('released', datetime.strptime(newValue['released'], '%Y-%m-%d'))
 
+def createUser(login_session):
+	newUser = User(name=login_session['username'], email=login_session[
+				   'email'], picture=login_session['picture'])
+	session.add(newUser)
+	session.commit()
+	user = session.query(User).filter_by(email=login_session['email']).one()
+	return user.id
+
+
+def getUserInfo(user_id):
+	user = session.query(User).filter_by(id=user_id).one()
+	return user
+
+
+def getUserID(email):
+	try:
+		user = session.query(User).filter_by(email=email).one()
+		return user.id
+	except:
+		return None
+
 
 # Create anti-forgery state token
 @app.route('/login/')
@@ -124,6 +145,12 @@ def gconnect():
 	login_session['email'] = useremail
 	# ADD PROVIDER TO LOGIN SESSION
 	login_session['provider'] = 'google'
+
+	# see if user exists, if it doesn't make a new one
+	user_id = getUserID(useremail)
+	if not user_id:
+		user_id = createUser(login_session)
+	login_session['user_id'] = user_id
 
 	output = ''
 	output += '<h1>Welcome,'
