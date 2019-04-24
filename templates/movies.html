@@ -1,7 +1,7 @@
 {% extends "main.html" %}
 {% block title %}Movies{% endblock %}
 {% block body %}
-	<h1>{{ producer.name }}'s movies</h1>
+	<h1>{{ producer.name }}'s movies ({{ count }} Movies)</h1>
 	<div>
 		<a href="{{ url_for('newMovie', producer_id = producer.id) }}">Create a new movie</a>
 		<div>

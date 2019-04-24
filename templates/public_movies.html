@@ -2,7 +2,7 @@
 {% block title %}Movies{% endblock %}
 {% block body %}
 	<div>
-		<h1>{{ producer.name }}'s movies</h1>
+		<h1>{{ producer.name }}'s movies ({{ count }} Movies)</h1>
 		<div>
 			{%if movies%}
 				{% for movie in movies %}
