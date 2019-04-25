@@ -12,34 +12,34 @@ It also has JSON endpoints to get data as needed from the database.
 
   
 * templates/
---- deletemovie.html
---- deleteproducer.html
---- editmovie.html
---- editproducer.html
---- header.html
---- login.html
---- main.html
---- movies.html
---- newmovie.html
---- newproducer.html
---- producers.html
---- public_movies.html
---- public_producers.html
+  * deletemovie.html
+  * deleteproducer.html
+  * editmovie.html
+  * editproducer.html
+  * header.html
+  * login.html
+  * main.html
+  * movies.html
+  * newmovie.html
+  * newproducer.html
+  * producers.html
+  * public_movies.html
+  * public_producers.html
 * screenshots/
---- movie_delete.png
---- movie_edit.png
---- movie_json.png
---- movies_json.png
---- movies.png
---- movies_signedin.png
---- producers.png
---- producers_json.png
---- producers_signedin.png
+  * movie_delete.png
+  * movie_edit.png
+  * movie_json.png
+  * movies_json.png
+  * movies.png
+  * movies_signedin.png
+  * producers.png
+  * producers_json.png
+  * producers_signedin.png
 * static/
---- image/
----  --- movies-banner.jpg
---- css/
----  --- style.css
+  * image/
+    * movies-banner.jpg
+  * css/
+    * style.css
 * client_secrets.json
 * db_setup.py
 * lotsofmovies.py
