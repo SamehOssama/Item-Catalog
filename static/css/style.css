@@ -1,0 +1,15 @@
+.container {
+	background-color: rgb(219, 219, 219);
+}
+
+.banner {
+	height: 100px;
+	background: url("/static/image/movies-banner.jpg");
+	background-position: right;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+#prod-name {
+	font-size: 20px;
+}

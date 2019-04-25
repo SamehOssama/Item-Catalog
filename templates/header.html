@@ -1,20 +1,22 @@
-<div id="header">
-	<div>
-		<a href="{{ url_for('showProducers') }}">Show All Producers</a>
+<div class="row h-100 justify-content-center align-items-center">
+	<div id="header" class="col-md-10 col-md-offset-1 banner">
+		<a href="{{ url_for('showProducers') }}" class="pull-left btn btn-default">Show All Producers</a>
 		{%if 'username' not in session %}
-			<a href="{{url_for('showLogin')}}">Log in</a>
+			<a href="{{url_for('showLogin')}}" class="pull-right btn btn-default">Log in</a>
 		{% else %}
-			<a href="{{url_for('disconnect',state = STATE)}}">Sign out</a>
+			<a href="{{url_for('disconnect',state = STATE)}}" class="pull-right btn btn-default">Sign out</a>
 		{% endif %}
 	</div>
-	<div>
+</div>
+<div class="row">
+	<div class="col-md-10 col-md-offset-1">
 		{% with messages = get_flashed_messages() %}
 			{% if messages %}
-				<ul>
+				<div class="alert alert-info text-center">
 					{% for message in messages %}
-						<li><strong> {{ message }} </strong></li>
+						<h4> {{ message }} </h4>
 					{% endfor %}
-				</ul>
+				</div>
 			{% endif %}
 		{% endwith %}
 	</div>

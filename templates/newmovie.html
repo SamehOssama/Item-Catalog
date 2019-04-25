@@ -1,17 +1,21 @@
 {% extends "main.html" %}
 {% block title %}Add Movie{% endblock %}
 {% block body %}
-	<h1>New Movie From "{{ producer.name }}"</h1>
-	<div>
-		<form action="{{ url_for('newMovie', producer_id = producer.id) }}" method="POST">
-			Poster URL: <br><input type="text" name="poster" size="100"><br>
-			Name:	<br><input type="text" name="name"><br>
-			Short Plot:	<br><textarea name="plot" rows="5" cols="60" maxlength="300"></textarea><br>
-			Release date:	<br><input type="date" name="released"><br>
-			runtime:	<br><input type="text" size="4" name="runtime" maxlength="4">
-			<button disabled>min</button><br>
-			<input type="submit" value="Create">
-		</form>
-		<a href="{{ url_for('showMovies', producer_id = producer.id) }}">Cancel</a>
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2 text-center"><h1>New Movie From "{{ producer.name }}"</h1></div>
+	</div>
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2">
+			<form action="{{ url_for('newMovie', producer_id = producer.id) }}" method="POST">
+				Poster URL: <br><input type="text" name="poster" size="100"><br>
+				Name:	<br><input type="text" name="name"><br>
+				Short Plot:	<br><textarea name="plot" rows="5" cols="60" maxlength="300"></textarea><br>
+				Release date:	<br><input type="date" name="released"><br>
+				runtime:	<br><input type="text" size="4" name="runtime" maxlength="4">
+				<button disabled>min</button><br>
+				<input type="submit" value="Create">
+			</form>
+			<a href="{{ url_for('showMovies', producer_id = producer.id) }}">Cancel</a>
+		</div>
 	</div>
 {% endblock %}

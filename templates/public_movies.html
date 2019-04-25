@@ -1,24 +1,32 @@
 {% extends "main.html" %}
 {% block title %}Movies{% endblock %}
 {% block body %}
-	<h1>{{ producer.name }}'s movies ({{ count }} Movies)</h1>
-	<div>
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2 text-center">
+			<h1>{{ producer.name }}'s movies ({{ count }} Movies)</h1>
+		</div>
+	</div>
+	<div class="row">
 		{%if movies%}
 			{% for movie in movies %}
-				<p>
-					<img src="{{ movie.poster }}" alt="Movie Poster Unavailable" width="300px" height="445px" id="poster{{ movie.id }}" onerror="standby({{ movie.id }})">
-					<br>
-					{{ movie.name }}
-					<br>
-					{{ movie.plot }}
-					<br>
-					{{ movie.released }}
-					<br>
-					{{ movie.runtime }} min
-				</p>
+				<div class="col-md-4 m-4 p-4 text-center">
+						<img src="{{ movie.poster }}" alt="Movie Poster Unavailable" width="300px" height="445px" id="poster{{ movie.id }}" class="img-rounded" onerror="standby({{ movie.id }})">
+					<div class="row moviename">
+						<h4>{{ movie.name }}</h4>
+					</div>
+					<div class="row" id="plot">
+						<p>{{ movie.plot }}</p>
+					</div>
+					<div class="row">
+						<p>{{ movie.released }}</p>
+					</div>
+					<div class="row">
+						<p>{{ movie.runtime }} min</p>
+					</div>
+				</div>
 			{% endfor %}
 		{%else%}
-			<h2>No movies available.</h2>
+			<div class="col-md-4 m-4 p-4 text-center"><h2>No movies available.</h2></div>
 		{%endif%}
 	</div>	
 	<script>

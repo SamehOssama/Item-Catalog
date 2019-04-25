@@ -1,12 +1,14 @@
 {% extends "main.html" %}
 {% block title %}Producers{% endblock %}
 {% block body %}
-	<div>
-		<h1>Producers</h1>
-		<div>
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2 text-center"><h1>Producers</h1></div>
+	</div>
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2">
 			{%if producers%}
 				{% for producer in producers %}
-					<p>
+					<p id="prod-name">
 						<a href="{{ url_for('showMovies', producer_id = producer.id) }}">{{ producer.name }}</a>
 					</p>
 				{% endfor %}

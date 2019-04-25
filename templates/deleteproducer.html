@@ -1,12 +1,18 @@
 {% extends "main.html" %}
 {% block title %}Delete Producer{% endblock %}
 {% block body %}
-	<h1>Delete Producer {{ producer.name }}</h1>
-	<div>
-		<p>Are you sure you want to delete producer : {{ producer.name }}</p>
-		<form action="{{ url_for('deleteProducer', producer_id = producer.id) }}" method="POST">
-			<input type="submit" value="Delete">
-		</form>
-		<a href="{{ url_for('showProducers') }}">Cancel</a>
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2 text-center">
+			<h1>Delete Producer {{ producer.name }}</h1>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6 col-md-offset-2">
+			<p>Are you sure you want to delete producer : {{ producer.name }}</p>
+			<form action="{{ url_for('deleteProducer', producer_id = producer.id) }}" method="POST">
+				<input type="submit" value="Delete">
+			</form>
+			<a href="{{ url_for('showProducers') }}">Cancel</a>
+		</div>
 	</div>
 {% endblock %}

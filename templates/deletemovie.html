@@ -1,8 +1,13 @@
 {% extends "main.html" %}
 {% block title %}Delete Movie{% endblock %}
 {% block body %}
-	<h1>Delete Movie {{ movie.name }}</h1>
-	<div>
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2 text-center">
+			<h1>Delete Movie {{ movie.name }}</h1>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6 col-md-offset-2">
 		<p>Are you sure you want to delete movie : {{ movie.name }} from "{{ producer.name }}"</p>
 		<form action="{{ url_for('deleteMovie', producer_id = producer.id, movie_id = movie.id) }}" method="POST">
 			<input type="submit" value="Delete">

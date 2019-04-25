@@ -1,25 +1,26 @@
 {% extends "main.html" %}
 {% block title %}Log In{% endblock %}
 {% block head %}
-	<script
-		src="https://code.jquery.com/jquery-3.4.0.min.js"
-		integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg="
-		crossorigin="anonymous"></script>
 	<meta name="google-signin-scope" content="profile email">
 	<meta name="google-signin-client_id" content="999879487660-3fe486qt6l9e82tp8eh94u9lsc4gm4vj.apps.googleusercontent.com">
 	<script src="https://apis.google.com/js/platform.js" async defer></script>
 {% endblock %}
 {% block body %}
 <!--  GOOGLE PLUS SIGN IN BUTTON -->
-	<div id="signinButton" 
-		class="g-signin2" 
-		data-onsuccess="onSignIn" 
-		data-longtitle="true">
+	<div class="row">
+		<div class="col-md-4 col-md-offset-4">
+			<div id="signinButton" 
+				class="g-signin2" 
+				data-onsuccess="onSignIn" 
+				data-longtitle="true">
+			</div>
+		</div>
 	</div>
-	<div id="result"></div>
+	<div id="result" class="col-md-4 col-md-offset-4"></div>
 	<script>
 		function onSignIn(googleUser) {
 			$('#signinButton').attr('style', 'display: none');
+			$('#result').html("<h3>Signing In ...</h3>")
 			// Useful data for your client-side scripts:
 			var profile = googleUser.getBasicProfile();
 			console.log("ID: " + profile.getId()); // Don't send this directly to your server!
