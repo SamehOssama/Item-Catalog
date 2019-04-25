@@ -1,5 +1,6 @@
 .container {
 	background-color: rgb(219, 219, 219);
+	min-height: 700px;
 }
 
 .banner {
@@ -7,7 +8,7 @@
 	background: url("/static/image/movies-banner.jpg");
 	background-position: right;
 	background-repeat: no-repeat;
-	background-size: cover;
+	background-size: 100% 100%;
 }
 
 #prod-name {
