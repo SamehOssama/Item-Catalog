@@ -172,7 +172,7 @@ def disconnect():
 @app.route('/producer/')
 def showProducers():
     # get producers data
-    producers = session.query(Producer).all()
+    producers = session.query(Producer).order_by('name').all()
 
     if 'username' not in login_session:
         # render a template without create/update/delete
