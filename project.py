@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
 from flask import (
-            Flask, render_template, request, redirect,
-            url_for, flash, jsonify, session as login_session
+            Flask, render_template, request, redirect, url_for,
+            flash, jsonify, session as login_session, make_response
             )
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -12,15 +12,11 @@ from datetime import datetime
 import random
 import string
 
-from oauth2client.client import flow_from_clientsecrets
-from oauth2client.client import FlowExchangeError
-
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
 import httplib2
 import json
-from flask import make_response
 import requests
 
 app = Flask(__name__)
@@ -71,8 +67,11 @@ def getUserInfo(user_id):
 
 
 def getUserID(email):
-    user = session.query(User).filter_by(email=email).one()
-    return user.id
+    user = session.query(User).filter_by(email=email).first()
+    if user:
+        return user.id
+    else:
+        return None
 
 # ###########################-Login Related Routes-############################
 
@@ -222,16 +221,11 @@ def editProducer(producer_id):
 
     # check if user is the owner of this producer
     if producerToEdit.user_id != login_session['user_id']:
-        return """
-        <script>
-            function myFunction() {
-                alert('You are not authorized to edit this producer.
-                Please add your own producer in order to delete.');
-                window.location.href = '/producer';
-            }
-        </script>
-        <body onload='myFunction()'>
-        """
+        return ("<script>function myFunction() {"
+                + "alert('You are not authorized to edit this producer."
+                + "Please add your own producer in order to delete.');"
+                + "window.location.href = '/producer';}"
+                + "</script><body onload='myFunction()'>")
 
     if request.method == 'POST':
         if request.form['name']:
@@ -258,24 +252,19 @@ def deleteProducer(producer_id):
 
     # check if signed in user is the owner of this producer
     if producerToDelete.user_id != login_session['user_id']:
-        return """
-        <script>
-            function myFunction() {
-                alert('You are not authorized to delete this producer.
-                Please add your own producer in order to delete.');
-                window.location.href = '/producer';
-            }
-        </script>
-        <body onload='myFunction()'>
-        """
+        return ("<script>function myFunction() {"
+                + "alert('You are not authorized to delete this producer. "
+                + "Please add your own producer in order to delete.');"
+                + "window.location.href = '/producer';}"
+                + "</script><body onload='myFunction()'>")
 
     if request.method == 'POST':
         # print(request.form['name'])
         session.delete(producerToDelete)
 
         # get movies from producer
-        producerMovies = session.query(Movie).
-        filter_by(producer_id=producer_id).all()
+        producerMovies = session.query(Movie).filter_by(
+            producer_id=producer_id).all()
         # delete all prducer movies
         for i in producerMovies:
             session.delete(i)
@@ -301,8 +290,8 @@ def showMovies(producer_id):
     creator = getUserInfo(producer.user_id)
 
     # get movies from producer
-    movies = session.query(Movie).filter_by(producer_id=producer_id).
-    order_by('released').all()
+    movies = session.query(Movie).filter_by(producer_id=producer_id).order_by(
+        'released').all()
 
     # get the number of movies from producer
     count = session.query(Movie).filter_by(producer_id=producer_id).count()
@@ -310,8 +299,8 @@ def showMovies(producer_id):
     # change the date object to a string
     toDateStr(movies)
 
-    if 'username' not in login_session or
-    creator.id != login_session['user_id']:
+    if ('username' not in login_session or
+       creator.id != login_session['user_id']):
         # render a template without create/update/delete
         return render_template('public_movies.html', producer=producer,
                                movies=movies, count=count, creator=creator)
@@ -333,9 +322,9 @@ def newMovie(producer_id):
 
     if request.method == 'POST':
         # make sure no input is empty
-        if request.form['name'] and request.form['plot'] and
-        request.form['runtime'] and request.form['released']
-        and request.form['poster']:
+        if (request.form['name'] and request.form['plot'] and
+           request.form['runtime'] and request.form['released']
+           and request.form['poster']):
             # check if runtime is empty or an int value
             if not request.form['runtime'].isdigit():
                 flash("Runtime should be a number")
@@ -384,17 +373,11 @@ def editMovie(producer_id, movie_id):
 
     # check if signed in user is the owner of this producer
     if movieToEdit.user_id != login_session['user_id']:
-        return """
-        <script>
-            function myFunction() {
-                alert('You are not authorized to edit movies
-                from this producer. Please add your own producer
-                in order to edit movies.');
-                window.location.href = '/producer';
-            }
-        </script>
-        <body onload='myFunction()'>
-        """
+        return ("<script>function myFunction() {"
+                + "alert('You are not authorized to edit movies from this "
+                + "producer. Please add your own producer in order to edit "
+                + "movies.');window.location.href = '/producer';}"
+                + "</script><body onload='myFunction()'>")
 
     if request.method == 'POST':
         post = request.form
@@ -444,17 +427,11 @@ def deleteMovie(producer_id, movie_id):
 
     # check if signed in user is the owner of this producer
     if movieToDelete.user_id != login_session['user_id']:
-        return """
-        <script>
-            function myFunction() {
-                alert('You are not authorized to delte movies
-                from this producer. Please add your own producer
-                in order to delete movies.');
-                window.location.href = '/producer';
-            }
-        </script>
-        <body onload='myFunction()'>
-        """
+        return ("<script>function myFunction() {"
+                + "alert('You are not authorized to delete movies from this "
+                + "producer. Please add your own producer in order to delete "
+                + "movies.');window.location.href = '/producer';}"
+                + "</script><body onload='myFunction()'>")
 
     if request.method == 'POST':
         session.delete(movieToDelete)
