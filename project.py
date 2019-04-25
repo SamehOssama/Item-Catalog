@@ -46,24 +46,6 @@ def toDateStr(DB_output):
 		session.expunge(DB_output) 
 		DB_output.released = datetime.strftime(DB_output.released, strformat)
 
-def checkForUpdate(oldValue, newValue):
-	""" 
-	Takes the new values from post rquest and run them against the current ones
-	then only update the values that have changed and not left empty
-	
-	Parameters: 
-	oldValue (obj): takes data from the DB
-	newValue (ImmutableMultiDict): takes data from post request
-	"""
-
-	intersection = oldValue.__dict__.keys() & newValue.to_dict().keys()
-	#session.expunge(oldValue)
-	for i in intersection:
-		if oldValue.__getattribute__(i) != newValue[i] and newValue[i] != "":
-			oldValue.__setattr__(i, newValue[i])
-	# change date format from str to date obj
-	oldValue.__setattr__('released', datetime.strptime(newValue['released'], '%Y-%m-%d'))
-
 ###############################-User Functions-###############################
 
 def createUser(login_session):
@@ -373,14 +355,22 @@ def editMovie(producer_id, movie_id):
 
 	if request.method == 'POST':
 		post = request.form
-
+		# edit movie data
+		if post['name']:
+			movieToEdit.name = post['name']
+		if post['plot']:
+			movieToEdit.plot = post['plot']
+		if post['poster']:
+			movieToEdit.poster = post['poster']
+		if post['released']:
+			# change date format from str to date object
+			movieToEdit.released = datetime.strptime(post['released'], '%Y-%m-%d')
 		#check if runtime is empty or an int value
 		if post['runtime'] and not post['runtime'].isdigit():
 			flash("Runtime Should Be A Number Or Left Empty")
 			return redirect(url_for('editMovie', producer_id = producer_id, movie_id = movie_id, producer = producer, movie = movieToEdit, STATE = login_session.get('state')))
-
-		# edit movie data
-		checkForUpdate(movieToEdit, post)
+		elif post['runtime']:
+			movieToEdit.runtime = post['runtime']
 		session.add(movieToEdit)
 		session.commit()
 
