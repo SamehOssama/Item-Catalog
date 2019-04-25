@@ -199,13 +199,18 @@ def newProducer():
 		return redirect(url_for('showLogin'))
 
 	if request.method == 'POST':
-		# add new movie
-		newProducer = Producer(name = request.form['name'], user_id = login_session['user_id'])
-		session.add(newProducer)
-		session.commit()
+		# make sure user inserted a name
+		if request.form['name']:
+			# add new movie
+			newProducer = Producer(name = request.form['name'], user_id = login_session['user_id'])
+			session.add(newProducer)
+			session.commit()
 
-		flash('New Producer {} Successfully Created'.format(newProducer.name))
-		return redirect(url_for('showProducers'))
+			flash('New Producer {} Successfully Created'.format(newProducer.name))
+			return redirect(url_for('showProducers'))
+		else:
+			flash("Add a producer name")
+			return render_template('newproducer.html', STATE = login_session.get('state'))
 	else:
 		return render_template('newproducer.html', STATE = login_session.get('state'))
 
@@ -317,20 +322,29 @@ def newMovie(producer_id):
 	producer = session.query(Producer).filter_by(id = producer_id).one()
 
 	if request.method == 'POST':
-		# Add new movie
-		newMovie = Movie(
-			name = request.form['name'], 
-			plot = request.form['plot'], 
-			runtime = request.form['runtime'], 
-			released = datetime.strptime(request.form['released'], '%Y-%m-%d'), 
-			poster = request.form['poster'], 
-			producer_id = producer_id,
-			user_id = login_session['user_id'])
-		session.add(newMovie)
-		session.commit()
-
-		flash('New Movie {0} Successfully Created for Producer {1}'.format(newMovie.name, producer.name))
-		return redirect(url_for('showMovies', producer_id = producer_id))
+		# make sure no input is empty
+		if request.form['name'] and request.form['plot'] and request.form['runtime'] and request.form['released'] and request.form['poster']:
+			#check if runtime is empty or an int value
+			if not request.form['runtime'].isdigit():
+				flash("Runtime should be a number")
+				return render_template('newmovie.html', producer = producer, STATE = login_session.get('state'))
+			# Add new movie
+			newMovie = Movie(
+				name = request.form['name'], 
+				plot = request.form['plot'], 
+				runtime = request.form['runtime'], 
+				released = datetime.strptime(request.form['released'], '%Y-%m-%d'), 
+				poster = request.form['poster'], 
+				producer_id = producer_id,
+				user_id = login_session['user_id'])
+			session.add(newMovie)
+			session.commit()
+			flash('New Movie {0} Successfully Created for Producer {1}'.format(newMovie.name, producer.name))
+		else:
+			flash('Please fill all the inputs')
+			return render_template('newmovie.html', producer = producer, STATE = login_session.get('state'))
+		return render_template(url_for('showMovies', producer_id = producer_id))
+		
 	else:
 		return render_template('newmovie.html', producer = producer, STATE=login_session.get('state'))
 
