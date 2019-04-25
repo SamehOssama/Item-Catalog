@@ -5,16 +5,16 @@
 		<div class="col-md-8 col-md-offset-2 text-center"><h1>Producers</h1></div>
 	</div>
 	<div class="row">
-		<div class="col-md-8 col-md-offset-2">
-			{%if producers%}
-				{% for producer in producers %}
-					<p id="prod-name">
-						<a href="{{ url_for('showMovies', producer_id = producer.id) }}">{{ producer.name }}</a>
+		{%if producers%}
+			{% for producer in producers %}
+				<div class="col-md-4 text-center">
+					<p>
+						<span id="prod-name"><a href="{{ url_for('showMovies', producer_id = producer.id) }}">{{ producer.name }}</a></span>
 					</p>
-				{% endfor %}
-			{%else%}
-				<h2>No producers available.</h2>
-			{%endif%}
-		</div>
+				</div>
+			{% endfor %}
+		{%else%}
+			<h2>No producers available.</h2>
+		{%endif%}
 	</div>
 {% endblock %}
