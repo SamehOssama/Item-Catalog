@@ -22,15 +22,18 @@ from flask import make_response
 import requests
 
 app = Flask(__name__)
-engine = create_engine('sqlite:///movies.db', connect_args={'check_same_thread': False})
-Base.metadata.bind = engine
-
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
-
 CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Producer Menu Application"
 
+# Connect to Database
+engine = create_engine('sqlite:///movies.db', connect_args={'check_same_thread': False})
+Base.metadata.bind = engine
+
+# Create database session
+DBSession = sessionmaker(bind=engine)
+session = DBSession()
+
+##############################-Helper Functions-##############################
 
 def toDateStr(DB_output):
 	""" Stop the database from updating the DB query 
@@ -62,6 +65,8 @@ def checkForUpdate(oldValue, newValue):
 	# change date format from str to date obj
 	oldValue.__setattr__('released', datetime.strptime(newValue['released'], '%Y-%m-%d'))
 
+###############################-User Functions-###############################
+
 def createUser(login_session):
 	newUser = User(name=login_session['username'], email=login_session[
 				   'email'], picture=login_session['picture'])
@@ -83,8 +88,8 @@ def getUserID(email):
 	except:
 		return None
 
+############################-Login Related Routes-############################
 
-# Create anti-forgery state token
 @app.route('/login/')
 def showLogin():
 	# Create anti-forgery state token
@@ -95,7 +100,6 @@ def showLogin():
 	return render_template('login.html', STATE = state)
 
 #GOOGLE Sign-IN
-
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
 	# Validate state token
@@ -162,8 +166,10 @@ def gconnect():
 	flash("You Are Now Logged In As {}.".format(login_session['username']))
 	return output
 
+# Log out part
 @app.route('/disconnect')
 def disconnect():
+	# Validate state token
 	if request.args.get('state') != login_session.get('state'):
 		response = make_response(json.dumps('Invalid state parameter.'), 401)
 		response.headers['Content-Type'] = 'application/json'
@@ -188,27 +194,38 @@ def disconnect():
 		redirect(url_for('showProducers'))
 	return redirect(url_for('showProducers'))
 
+#############################-Producer Web Pages-#############################
 
 @app.route('/')
 @app.route('/producer/')
 def showProducers():
 	print(login_session)
+
+	# get producers data
 	producers = session.query(Producer).all()
+
 	if 'username' not in login_session:
+		# render a template without create/update/delete
 		return render_template('public_producers.html', producers = producers)
 	else:
+		# render a template with full functionalities
 		return render_template('producers.html', producers = producers, STATE = login_session.get('state'))
 	#return "This page will show all the producers"
 
 @app.route('/producer/new/', methods=['GET', 'POST'])
 def newProducer():
+	# check if user is logged in
 	if 'username' not in login_session:
 		return redirect(url_for('showLogin'))
+
 	if request.method == 'POST':
 		#print(request.form['name'])
+		
+		# add new movie
 		newProducer = Producer(name = request.form['name'], user_id = login_session['user_id'])
 		session.add(newProducer)
 		session.commit()
+
 		flash('New Producer {} Successfully Created'.format(newProducer.name))
 		return redirect(url_for('showProducers'))
 		#return "Adding new producer"
@@ -218,9 +235,14 @@ def newProducer():
 
 @app.route('/producer/<int:producer_id>/edit/', methods=['GET', 'POST'])
 def editProducer(producer_id):
+	# check if user is logged in
 	if 'username' not in login_session:
 		return redirect(url_for('showLogin'))
+
+	# get producer data
 	producerToEdit = session.query(Producer).filter_by(id=producer_id).one()
+
+	# check if user is the owner of this producer
 	if producerToEdit.user_id != login_session['user_id']:
 		return """
 		<script>
@@ -231,12 +253,15 @@ def editProducer(producer_id):
 		</script>
 		<body onload='myFunction()'>
 		"""
+
 	if request.method == 'POST':
 		if request.form['name']:
 			#print(request.form['name'])
+			# edit producer data
 			producerToEdit.name = request.form['name']
 		session.add(producerToEdit)
 		session.commit()
+
 		flash('Producer Successfully Edited')
 		return redirect(url_for('showProducers'))
 		#return "Editing producer {}".format(producer_id)
@@ -246,9 +271,14 @@ def editProducer(producer_id):
 
 @app.route('/producer/<int:producer_id>/delete/', methods=['GET', 'POST'])
 def deleteProducer(producer_id):
+	# check if user is logged in
 	if 'username' not in login_session:
 		return redirect(url_for('showLogin'))
+
+	# get producer data
 	producerToDelete = session.query(Producer).filter_by(id = producer_id).one()
+
+	# check if signed in user is the owner of this producer
 	if producerToDelete.user_id != login_session['user_id']:
 		return """
 		<script>
@@ -259,13 +289,18 @@ def deleteProducer(producer_id):
 		</script>
 		<body onload='myFunction()'>
 		"""
+
 	if request.method == 'POST':
 		#print(request.form['name'])
 		session.delete(producerToDelete)
+
+		# get movies from producer
 		producerMovies = session.query(Movie).filter_by(producer_id = producer_id).all()
+		# delete all prducer movies
 		for i in producerMovies:
 			session.delete(i)
 		session.commit()
+
 		flash('Producer Successfully Deleted')
 		return redirect(url_for('showProducers'))
 		#return "Deleting producer {}".format(producer_id)
@@ -273,27 +308,48 @@ def deleteProducer(producer_id):
 		return render_template('deleteproducer.html', producer = producerToDelete, STATE=login_session.get('state'))
 		#return "This page will be for deleting producer {}".format(producer_id)
 
+##############################-Movie Web Pages-###############################
 
+# display the movies for the producer
 @app.route('/producer/<int:producer_id>/')
 @app.route('/producer/<int:producer_id>/movie/')
 def showMovies(producer_id):
+	# get producer data
 	producer = session.query(Producer).filter_by(id = producer_id).one()
+
+	# get the creator data
 	creator = getUserInfo(producer.user_id)
+
+	# get movies from producer
 	movies = session.query(Movie).filter_by(producer_id = producer_id).order_by('released').all()
+
+	# get the number of movies from producer
 	count = session.query(Movie).filter_by(producer_id = producer_id).count()
+
+	# change the date object to a string
 	toDateStr(movies)
+
+
 	if 'username' not in login_session or creator.id != login_session['user_id']:
+		# render a template without create/update/delete
 		return render_template('public_movies.html', producer = producer, movies = movies, count = count, creator=creator)
 	else:
+		# render a template with full functionalities
 		return render_template('movies.html', producer = producer, movies = movies, count = count,STATE=login_session.get('state'))
 	#return "This page is the movie list for producer {}".format(producer_id)
 
 @app.route('/producer/<int:producer_id>/movie/new/', methods=['GET', 'POST'])
 def newMovie(producer_id):
+	# check if user is logged in
 	if 'username' not in login_session:
 		return redirect(url_for('showLogin'))
+
+	# get producer data
 	producer = session.query(Producer).filter_by(id = producer_id).one()
+
 	if request.method == 'POST':
+
+		# Add new movie
 		newMovie = Movie(
 			name = request.form['name'], 
 			plot = request.form['plot'], 
@@ -319,10 +375,18 @@ def newMovie(producer_id):
 
 @app.route('/producer/<int:producer_id>/movie/<int:movie_id>/edit/', methods=['GET', 'POST'])
 def editMovie(producer_id, movie_id):
+
+	# make sure the user is logged in
 	if 'username' not in login_session:
 		return redirect(url_for('showLogin'))
+
+	# get producer data
 	producer = session.query(Producer).filter_by(id = producer_id).one()
+
+	# get movie data
 	movieToEdit = session.query(Movie).filter_by(id = movie_id).one()
+
+	# check if signed in user is the owner of this producer
 	if movieToEdit.user_id != login_session['user_id']:
 		return """
 		<script>
@@ -333,12 +397,16 @@ def editMovie(producer_id, movie_id):
 		</script>
 		<body onload='myFunction()'>
 		"""
+
 	if request.method == 'POST':
 		post = request.form
+
 		#check if runtime is empty or an int value
 		if post['runtime'] and not post['runtime'].isdigit():
 			flash("Runtime Should Be A Number Or Left Empty")
 			return render_template('editmovie.html', producer = producer, movie = movieToEdit, STATE = login_session.get('state'))
+
+		# edit movie data
 		checkForUpdate(movieToEdit, post)
 		session.add(movieToEdit)
 		session.commit()
@@ -357,10 +425,17 @@ def editMovie(producer_id, movie_id):
 
 @app.route('/producer/<int:producer_id>/movie/<int:movie_id>/delete/', methods=['GET', 'POST'])
 def deleteMovie(producer_id, movie_id):
+	# make sure the user is logged in
 	if 'username' not in login_session:
 		return redirect(url_for('showLogin'))
+
+	# get producer data
 	producer = session.query(Producer).filter_by(id = producer_id).one()
+
+	# get movie data
 	movieToDelete = session.query(Movie).filter_by(id = movie_id).one()
+
+	# check if signed in user is the owner of this producer
 	if movieToDelete.user_id != login_session['user_id']:
 		return """
 		<script>
@@ -371,6 +446,7 @@ def deleteMovie(producer_id, movie_id):
 		</script>
 		<body onload='myFunction()'>
 		"""
+
 	if request.method == 'POST':
 		session.delete(movieToDelete)
 		session.commit()
@@ -382,24 +458,33 @@ def deleteMovie(producer_id, movie_id):
 		return render_template('deletemovie.html', producer = producer, movie = movieToDelete, STATE = login_session.get('state'))
 		#return "This page is for deleting movie {}".format(movie_id)
 
+#############################-JSON API Endpoint-##############################
 
 @app.route('/api/producers/')
 def showProducersJSON():
+	# get producers data
 	producers = session.query(Producer).all()
 	return jsonify(Producers=[i.serialize for i in producers])
 
 @app.route('/api/producers/<int:producer_id>/movies/')
 def showMoviesJSON(producer_id):
+	# get movies data
 	movies = session.query(Movie).filter_by(producer_id = producer_id).all()
+
+	# change the date object to a string
 	toDateStr(movies)
 	return jsonify(Movies=[i.serialize for i in movies])
 
 @app.route('/api/producers/<int:producer_id>/movies/<int:movie_id>/')
 def showMovieJSON(producer_id, movie_id):
+	# get movie data
 	movie = session.query(Movie).filter_by(id = movie_id).one()
+
+	# change the date object to a string
 	toDateStr(movie)
 	return jsonify(Movie=movie.serialize)
 
+##########################-########################-##########################
 
 if __name__ == '__main__':
 	app.secret_key = 'super_secret_key'
