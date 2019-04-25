@@ -210,7 +210,7 @@ def newProducer():
 			return redirect(url_for('showProducers'))
 		else:
 			flash("Add a producer name")
-			return render_template('newproducer.html', STATE = login_session.get('state'))
+			return redirect(url_for('newProducer', STATE = login_session.get('state')))
 	else:
 		return render_template('newproducer.html', STATE = login_session.get('state'))
 
@@ -327,7 +327,7 @@ def newMovie(producer_id):
 			#check if runtime is empty or an int value
 			if not request.form['runtime'].isdigit():
 				flash("Runtime should be a number")
-				return render_template('newmovie.html', producer = producer, STATE = login_session.get('state'))
+				return redirect(url_for('newMovie', producer_id = producer_id, producer = producer, STATE = login_session.get('state')))
 			# Add new movie
 			newMovie = Movie(
 				name = request.form['name'], 
@@ -340,13 +340,12 @@ def newMovie(producer_id):
 			session.add(newMovie)
 			session.commit()
 			flash('New Movie {0} Successfully Created for Producer {1}'.format(newMovie.name, producer.name))
+			return redirect(url_for('showMovies', producer_id = producer_id))
 		else:
 			flash('Please fill all the inputs')
-			return render_template('newmovie.html', producer = producer, STATE = login_session.get('state'))
-		return render_template(url_for('showMovies', producer_id = producer_id))
-		
+			return redirect(url_for('newMovie', producer_id = producer_id, producer = producer, STATE = login_session.get('state')))
 	else:
-		return render_template('newmovie.html', producer = producer, STATE=login_session.get('state'))
+		return render_template('newmovie.html', producer_id = producer_id, producer = producer, STATE=login_session.get('state'))
 
 @app.route('/producer/<int:producer_id>/movie/<int:movie_id>/edit/', methods=['GET', 'POST'])
 def editMovie(producer_id, movie_id):
@@ -378,7 +377,7 @@ def editMovie(producer_id, movie_id):
 		#check if runtime is empty or an int value
 		if post['runtime'] and not post['runtime'].isdigit():
 			flash("Runtime Should Be A Number Or Left Empty")
-			return render_template('editmovie.html', producer = producer, movie = movieToEdit, STATE = login_session.get('state'))
+			return redirect(url_for('editMovie', producer_id = producer_id, movie_id = movie_id, producer = producer, movie = movieToEdit, STATE = login_session.get('state')))
 
 		# edit movie data
 		checkForUpdate(movieToEdit, post)
